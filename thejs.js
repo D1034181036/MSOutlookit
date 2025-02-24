@@ -1,3 +1,21 @@
+var customSubList = [
+  'Front Page',
+  'pics',
+  'askreddit',
+  'gaming',
+  'sbcgaming',
+  'globaloffensive',
+  'slaythespire',
+  'MadeMeSmile',
+  // 'deadlockthegame',
+  // 'brotato',
+  // 'balatro',
+  // 'reddit.com',
+  // 'dadjokes',
+  // 'me_irl',
+  // 'technicallythetruth',
+];
+
 var noTaskbar = 0;
 var alwaysHideNSFW = true;
 var randomNames = [
@@ -845,14 +863,9 @@ $(document).ready(function() {
   onResize();
   $(window).resize(onResize);
   $('.newemailbutton').click(addSubReddit);
-  main_inbox = makeFolder('Front Page');
-  makeFolder('gaming');
-  makeFolder('pics');
-  makeFolder('askreddit');
-  makeFolder('jokes');
-  makeFolder('funny');
-  makeFolder('iama');
-  makeFolder('wtf');
+  for (sub of customSubList) {
+    makeFolder(sub);
+  }
   $('#folder_FrontPage').parent().addClass('foldwraphi');
   folderClick('folder_FrontPage');
   $('.outlookmin').click(function() {
