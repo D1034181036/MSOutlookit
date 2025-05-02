@@ -1,19 +1,18 @@
 var customSubList = [
   'Front Page',
-  'pics',
-  'askreddit',
-  'gaming',
-  'sbcgaming',
-  'globaloffensive',
-  'slaythespire',
+  'Pics',
+  'AskReddit',
+  'Gaming',
+  'SBCGaming',
+  'GlobalOffensive',
+  'SlayTheSpire',
   'MadeMeSmile',
-  // 'deadlockthegame',
+  'VirtualPinball',
   // 'brotato',
   // 'balatro',
-  // 'reddit.com',
-  // 'dadjokes',
   // 'me_irl',
-  // 'technicallythetruth',
+  // 'dadjokes',
+  // 'reddit.com',
 ];
 
 var noTaskbar = 0;
