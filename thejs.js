@@ -548,8 +548,8 @@ function isActuallyImgur(externallink) {
 function onResize() {
   $('.backgradient').height($(window).height() - 139 + noTaskbar * 60);
   $('.mainrow').height($(window).height() - 166 + noTaskbar * 60);
-  $('#previewarea').height($(window).height() - 216 + noTaskbar * 60);
-  $('.theemailbody').height($(window).height() - 146 + noTaskbar * 60);
+  $('#previewarea').height($(window).height() - 220 + noTaskbar * 60);
+  $('.theemailbody').height($(window).height() - 180 + noTaskbar * 60);
   $('.right').width($(window).width() - 640 + noTaskbar * 60);
   $('.minholder').width($(window).width() - (180 + 170) + noTaskbar * 60);
   $('.folderholder').height($(window).height() - 490 + noTaskbar * 60);
