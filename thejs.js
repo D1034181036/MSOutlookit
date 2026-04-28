@@ -9,6 +9,8 @@ var customSubList = [
   'MadeMeSmile',
   'VirtualPinball',
   'Ereader',
+  'Turntables',
+
   // 'brotato',
   // 'balatro',
   // 'me_irl',
