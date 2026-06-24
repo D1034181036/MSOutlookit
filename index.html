@@ -826,10 +826,47 @@ div.lynxexpando:hover {
 opacity:1.0;
 }
 
-.expandoimg {
+/* keep any expando image/video from spilling past the email body */
+.theemailbody img,
+.theemailbody video {
+	max-width:100%;
+	height:auto;
+}
+
+/* expando + gallery images render small and aspect-correct; the .theemailbody
+   prefix raises specificity so these win over the rule above */
+.theemailbody .expandoimg,
+.theemailbody .galleryimg {
 	display:block;
-	width:100%;
-	margin:20px;
+	max-width:600px;
+	height:auto;
+	margin:20px 0;
+}
+
+.gallerynav {
+	margin:8px 0;
+	color:#FFF;
+	font-weight:bold;
+	user-select:none;
+}
+
+.galleryprev, .gallerynext {
+	display:inline-block;
+	padding:3px 10px;
+	background:#0033CC;
+	color:#FFF;
+	cursor:pointer;
+	border-radius:3px;
+}
+
+.galleryprev:hover, .gallerynext:hover {
+	background:#0044EE;
+}
+
+.gallerycount {
+	display:inline-block;
+	padding:0 10px;
+	color:#333;
 }
 
 .lynxexpandodiv {

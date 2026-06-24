@@ -2,17 +2,16 @@ var customSubList = [
   'Front Page',
   'Pics',
   'AskReddit',
-  'Gaming',
-  'GlobalOffensive',
   'MadeMeSmile',
-  'AmItheAsshole',
-
+  'Gaming',
   'SBCGaming',
+  'GlobalOffensive',
   'SlayTheSpire',
   'VirtualPinball',
-  'Ereader',
   'Turntables',
+  'AmItheAsshole',
   
+  // 'Ereader',
   // 'brotato',
   // 'balatro',
   // 'me_irl',
@@ -57,6 +56,7 @@ var randomNames = [
 ];
 var idList = [];
 var globalStoryDict = {};
+var globalGalleryDict = {};
 
 function getRandomName() {
   return randomNames[Number(Math.floor(Math.random() * randomNames.length))];
@@ -293,7 +293,10 @@ function commentsCallback(storyJSON) {
   mainJSON = storyJSON[0].data.children[0].data;
   var theStoryID = mainJSON.name;
   var story = globalStoryDict[theStoryID];
-  if (isImgur(mainJSON.url)) {
+  if (isGallery(mainJSON)) {
+    var expando = makeGalleryExpando(mainJSON, mainJSON.title);
+    story.bodyHTML += expando;
+  } else if (isImgur(mainJSON.url)) {
     var expando = makeImgurExpando(mainJSON.url, mainJSON.title);
     story.bodyHTML += expando;
   } else {
@@ -460,19 +463,6 @@ function expandoClick() {
   var tempid = $(this).attr('id');
   var finder = '#img' + tempid;
   $(finder).toggle();
-  var resizeFunc = function() {
-    var idFinder = finder;
-    var height = $(idFinder).children('.ui-wrapper').height();
-    var width = $(idFinder).children('.ui-wrapper').width() - 10;
-    $(idFinder).children('.ui-wrapper').children('.ui-resizable-e').width(width);
-    $(idFinder).children('.ui-wrapper').children('.ui-resizable-e').height(height);
-    $(idFinder).children('.ui-wrapper').children('.ui-resizable-e').css('top', '-' + String(height) + 'px');
-  }
-  $(finder).children('img.normal').resizable({
-    'aspectRatio': true,
-    resize: resizeFunc
-  });
-  resizeFunc();
 }
 
 function makeImgurExpando(externallink, title) {
@@ -487,16 +477,86 @@ function makeImgurExpando(externallink, title) {
   var expando = '<div class="showhover expando" id="' + randId + '" >+</div>';
   if (externallink.indexOf('.gifv') >= 0) {
     externallink = externallink.replace(".gifv", ".mp4");
-    expando += '<a href="javascript:void(0)" class="expando" id="' + randId + '">' + title + '</a>';
-    expando += '<div id="' + 'img' + randId + '" style="width:100%;display:none">';
-    expando += '<video class="normal" id="' + 'ig' + randId + '" class="expandoimg" style="width:100%;" autoplay loop><source src="' + externallink + '" type="video/mp4"></video>';
+    expando += '<a href="' + externallink + '" target="_blank">' + title + '</a>';
+    expando += '<div id="' + 'img' + randId + '" style="display:none">';
+    expando += '<video class="normal expandoimg" id="' + 'ig' + randId + '" autoplay loop><source src="' + externallink + '" type="video/mp4"></video>';
   } else {
-    expando += '<a href="javascript:void(0)" class="expando" id="' + randId + '">' + title + '</a>';
-    expando += '<div id="' + 'img' + randId + '" style="width:100%;display:none">';
-    expando += '<img class="normal" id="' + 'ig' + randId + '" class="expandoimg" src="' + externallink + '" style="width:100%;" alt="redditlol"/>';
+    expando += '<a href="' + externallink + '" target="_blank">' + title + '</a>';
+    expando += '<div id="' + 'img' + randId + '" style="display:none">';
+    expando += '<img class="normal expandoimg" id="' + 'ig' + randId + '" src="' + externallink + '" alt="redditlol"/>';
   }
   expando += '</div>';
   return expando;
+}
+
+// Reddit native galleries: gallery_data.items is the ordered list of media_ids,
+// media_metadata holds each image keyed by media_id. We build i.redd.it urls and
+// render a single-image viewer with prev/next controls.
+function isGallery(mainJSON) {
+  return mainJSON.is_gallery === true && mainJSON.gallery_data != null && mainJSON.media_metadata != null;
+}
+
+function getGalleryUrls(mainJSON) {
+  var urls = [];
+  var items = mainJSON.gallery_data.items;
+  for (var i = 0; i < items.length; i++) {
+    var mediaId = items[i].media_id;
+    var meta = mainJSON.media_metadata[mediaId];
+    if (meta == null) {
+      continue;
+    }
+    var ext = 'jpg';
+    if (meta.m) {
+      ext = meta.m.split('/')[1]; // e.g. "image/png" -> "png"
+    }
+    urls.push('https://i.redd.it/' + mediaId + '.' + ext);
+  }
+  return urls;
+}
+
+function makeGalleryExpando(mainJSON, title) {
+  var urls = getGalleryUrls(mainJSON);
+  var randId = String(Math.floor(Math.random() * 10000));
+  // Stash the url list so the prev/next handlers can read it back later.
+  globalGalleryDict[randId] = urls;
+  var expando = '<div class="showhover expando" id="' + randId + '" >+</div>';
+  expando += '<a href="' + mainJSON.url + '" target="_blank">' + title + ' (' + urls.length + ' images)</a>';
+  expando += '<div id="img' + randId + '" class="gallery" data-gallery="' + randId + '" data-index="0" style="display:none">';
+  expando += '<div class="gallerynav">';
+  expando += '<span class="galleryprev" data-gallery="' + randId + '">&laquo; Prev</span> ';
+  expando += '<span class="gallerycount">1 / ' + urls.length + '</span> ';
+  expando += '<span class="gallerynext" data-gallery="' + randId + '">Next &raquo;</span>';
+  expando += '</div>';
+  var firstUrl = urls.length > 0 ? urls[0] : '';
+  expando += '<img class="galleryimg" id="ig' + randId + '" src="' + firstUrl + '" alt="redditgallery"/>';
+  expando += '</div>';
+  return expando;
+}
+
+function showGalleryImage(randId, index) {
+  var urls = globalGalleryDict[randId];
+  if (urls == null || urls.length == 0) {
+    return;
+  }
+  // wrap around so prev on the first goes to the last and vice versa
+  if (index < 0) {
+    index = urls.length - 1;
+  }
+  if (index >= urls.length) {
+    index = 0;
+  }
+  var holder = $('#img' + randId);
+  holder.attr('data-index', index);
+  $('#ig' + randId).attr('src', urls[index]);
+  holder.children('.gallerynav').children('.gallerycount').text((index + 1) + ' / ' + urls.length);
+}
+
+function galleryNavClick(delta) {
+  return function() {
+    var randId = $(this).attr('data-gallery');
+    var index = Number($('#img' + randId).attr('data-index'));
+    showGalleryImage(randId, index + delta);
+  };
 }
 
 function makeYoutubeExpando(externallink, title) {
@@ -569,6 +629,8 @@ function onReload() {
 function onStoryLoad() {
   $('.expando').click(expandoClick);
   $('.lynxexpando').click(lynxexpandoClick);
+  $('.galleryprev').click(galleryNavClick(-1));
+  $('.gallerynext').click(galleryNavClick(1));
   $('.textreplybutton').click(function() {
     var id = $(this).attr('id').substr(1);
     spawnReplyWindow(id);
