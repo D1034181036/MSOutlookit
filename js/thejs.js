@@ -8,8 +8,9 @@ var customSubList = [
   'GlobalOffensive',
   'SlayTheSpire',
   'VirtualPinball',
-  'Turntables',
   'AmItheAsshole',
+  'Turntables',
+  'Hearthstone',
   
   // 'Ereader',
   // 'brotato',
@@ -294,21 +295,15 @@ function commentsCallback(storyJSON) {
   var theStoryID = mainJSON.name;
   var story = globalStoryDict[theStoryID];
   if (isGallery(mainJSON)) {
-    var expando = makeGalleryExpando(mainJSON, mainJSON.title);
-    story.bodyHTML += expando;
+    story.bodyHTML += makeGalleryExpando(mainJSON, mainJSON.title);
   } else if (isImgur(mainJSON.url)) {
-    var expando = makeImgurExpando(mainJSON.url, mainJSON.title);
-    story.bodyHTML += expando;
-  } else {
+    story.bodyHTML += makeImgurExpando(mainJSON.url, mainJSON.title);
+  } else if (!mainJSON.is_self) {
     story.bodyHTML += '<a href="' + mainJSON.url + '">' + mainJSON.title + '</a><br/>';
-    if (mainJSON.selftext_html) {
-      story.bodyHTML += mainJSON.selftext_html;
-    }
   }
-  if (mainJSON.isSelf) {
-    if (mainJSON.selftext_html != null) {
-      story.bodyHTML += mainJSON.selftext_html;
-    }
+  // 圖片與內文文字並存：圖片 expando 之後仍要補上貼文文字
+  if (mainJSON.selftext_html) {
+    story.bodyHTML += mainJSON.selftext_html;
   }
   story.bodyHTML = unEncode(story.bodyHTML);
   story.bodyHTML += '<div class="storycommentline"></div>';
