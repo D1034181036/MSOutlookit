@@ -298,8 +298,8 @@ function commentsCallback(storyJSON) {
     story.bodyHTML += makeGalleryExpando(mainJSON, mainJSON.title);
   } else if (isImgur(mainJSON.url)) {
     story.bodyHTML += makeImgurExpando(mainJSON.url, mainJSON.title);
-  } else if (!mainJSON.is_self) {
-    story.bodyHTML += '<a href="' + mainJSON.url + '">' + mainJSON.title + '</a><br/>';
+  } else {
+    story.bodyHTML += `<a href="${mainJSON.url}" target="_blank">${mainJSON.title}</a><br/><br/>`;
   }
   // 圖片與內文文字並存：圖片 expando 之後仍要補上貼文文字
   if (mainJSON.selftext_html) {
